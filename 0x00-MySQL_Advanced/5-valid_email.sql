@@ -1,9 +1,14 @@
 -- Write a SQL script that creates a trigger that resets the attribute valid_email
-CREATE TRIGGER reset_valid_email
-AFTER
-UPDATE ON users FOR EACH ROW BEGIN IF NEW.email <> OLD.email THEN
-UPDATE users
-SET valid_email = 0
-WHERE id = NEW.id;
-END IF;
-END;
+DROP TRIGGER IF EXISTS validate_email;
+DELIMITER $$
+CREATE TRIGGER validate_email
+BEFORE UPDATE ON users
+FOR EACH ROW
+BEGIN
+    IF OLD.email != NEW.email THEN
+        SET NEW.valid_email = 0;
+    ELSE
+        SET NEW.valid_email = NEW.valid_email;
+    END IF;
+END $$
+DELIMITER;
